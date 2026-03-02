@@ -55,11 +55,13 @@ RUN TARGET_KVER=$(dnf repoquery --requires --recursive --resolve nvidia-open | \
     rpm -qa | grep kernel-core | grep -v "${TARGET_KVER}" | xargs -r dnf remove -y && \
     find /usr/lib/modules -mindepth 1 -maxdepth 1 -type d ! -name "${TARGET_KVER}" -exec rm -rf {} + && \
     dnf install -y nvidia-open && \
+    NVIDIA_VER=$(rpm -q --queryformat '%{VERSION}' kmod-nvidia-open-dkms) && \
+    dkms install -m nvidia-open -v ${NVIDIA_VER} -k ${TARGET_KVER} && \
     dnf clean all
 
 RUN TARGET_KVER=$(rpm -q --queryformat '%{VERSION}-%{RELEASE}.%{ARCH}\n' kernel-core | head -n 1) && \
-    ls -l /usr/lib/modules/$TARGET_KVER/extra/nvidia/nvidia.ko && \
-    depmod -a $TARGET_KVER
+    echo "Searching for modules in /usr/lib/modules/${TARGET_KVER}..." && \
+    find /usr/lib/modules/${TARGET_KVER} -name "nvidia.ko*" || (echo "STILL MISSING!" && exit 1)
 
 RUN dnf -y in virt-manager \
     libvirt-daemon-kvm \
