@@ -16,7 +16,6 @@ RUN dnf -y install \
     default-fonts-core-sans \
     ptyxis \
     flatpak \
-    mesa-dri-drivers \
     pipewire \
     pipewire-pulseaudio \
     pipewire-alsa \
@@ -62,6 +61,9 @@ RUN TARGET_KVER=$(dnf repoquery --requires --recursive --resolve nvidia-open | \
 RUN TARGET_KVER=$(rpm -q --queryformat '%{VERSION}-%{RELEASE}.%{ARCH}\n' kernel-core | head -n 1) && \
     echo "Searching for modules in /usr/lib/modules/${TARGET_KVER}..." && \
     find /usr/lib/modules/${TARGET_KVER} -name "nvidia.ko*" || (echo "STILL MISSING!" && exit 1)
+
+RUN echo "blacklist nouveau" > /etc/modprobe.d/blacklist-nouveau.conf && \
+    echo "options nouveau modeset=0" >> /etc/modprobe.d/blacklist-nouveau.conf
 
 RUN dnf -y in virt-manager \
     libvirt-daemon-kvm \
