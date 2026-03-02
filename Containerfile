@@ -41,13 +41,17 @@ RUN /usr/bin/crb enable
 RUN dnf -y config-manager --add-repo \
     https://developer.download.nvidia.com/compute/cuda/repos/rhel10/x86_64/cuda-rhel10.repo
 
-RUN TARGET_KVER=$(dnf repoquery --requires --recursive --resolve nvidia-open | grep kernel-devel | awk -F'kernel-devel-' '{print $2}' | sort -V | tail -n 1) && \
-    echo "Identified Target: $TARGET_KVER" && \
+RUN TARGET_KVER=$(dnf repoquery --requires --recursive --resolve nvidia-open | \
+    grep kernel-devel | \
+    sed 's/.*matched-//; s/[0-9]://' | \
+    sort -V | tail -n 1) && \
+    echo "Cleaned Target Kernel: $TARGET_KVER" && \
     dnf install -y \
-        kernel-core-${TARGET_KVER}* \
-        kernel-modules-${TARGET_KVER}* \
-        kernel-devel-${TARGET_KVER}* \
-        kernel-headers-${TARGET_KVER}* && \
+        kernel-core-${TARGET_KVER} \
+        kernel-modules-${TARGET_KVER} \
+        kernel-modules-extra-${TARGET_KVER} \
+        kernel-devel-${TARGET_KVER} \
+        kernel-headers-${TARGET_KVER} && \
     rpm -qa | grep kernel-core | grep -v "${TARGET_KVER}" | xargs -r dnf remove -y && \
     find /usr/lib/modules -mindepth 1 -maxdepth 1 -type d ! -name "${TARGET_KVER}" -exec rm -rf {} + && \
     dnf install -y nvidia-open && \
@@ -62,6 +66,3 @@ RUN dnf -y in virt-manager \
     distrobox
 
 RUN systemctl enable libvirtd
-
-RUN TARGET_KVER=$(rpm -q --queryformat '%{VERSION}-%{RELEASE}.%{ARCH}\n' kernel-core | head -n 1) && \
-    depmod -a $TARGET_KVER
