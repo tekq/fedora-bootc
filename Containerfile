@@ -41,17 +41,26 @@ RUN /usr/bin/crb enable
 RUN dnf -y config-manager --add-repo \
     https://developer.download.nvidia.com/compute/cuda/repos/rhel10/x86_64/cuda-rhel10.repo
 
-RUN dnf -y update kernel* && \
-    dnf -y install kernel-devel kernel-headers && \
-    KVER=$(rpm -q --queryformat '%{VERSION}-%{RELEASE}.%{ARCH}\n' kernel-core | sort -V | tail -n 1) && \
+RUN TARGET_KVER=$(dnf repoquery --depends nvidia-open | grep kernel-devel-matched | awk -F'-matched-' '{print $2}') && \
+    echo "NVIDIA Repo targets: $TARGET_KVER" && \
+    dnf -y install \
+        kernel-core-$TARGET_KVER \
+        kernel-devel-$TARGET_KVER \
+        kernel-modules-$TARGET_KVER \
+        kernel-modules-extra-$TARGET_KVER && \
+    rpm -qa | grep kernel-core | grep -v "$TARGET_KVER" | x86_64 xargs -r dnf -y remove && \
     dnf -y install nvidia-open && \
     dnf clean all
 
-RUN KVER=$(rpm -q --queryformat '%{VERSION}-%{RELEASE}.%{ARCH}\n' kernel-core | sort -V | tail -n 1) && \
-    ls -l /usr/lib/modules/$KVER/extra/nvidia/nvidia.ko
+RUN TARGET_KVER=$(rpm -q --queryformat '%{VERSION}-%{RELEASE}.%{ARCH}\n' kernel-core | head -n 1) && \
+    ls -l /usr/lib/modules/$TARGET_KVER/extra/nvidia/nvidia.ko || \
+    (echo "Driver mismatch! No module found for $TARGET_KVER" && exit 1)
 
 RUN dnf -y in virt-manager \
     libvirt-daemon-kvm \
     distrobox
 
 RUN systemctl enable libvirtd
+
+RUN TARGET_KVER=$(rpm -q --queryformat '%{VERSION}-%{RELEASE}.%{ARCH}\n' kernel-core | head -n 1) && \
+    depmod -a $TARGET_KVER
