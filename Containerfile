@@ -41,18 +41,14 @@ RUN /usr/bin/crb enable
 RUN dnf -y config-manager --add-repo \
     https://developer.download.nvidia.com/compute/cuda/repos/rhel10/x86_64/cuda-rhel10.repo
 
-RUN KVER=$(rpm -q --queryformat '%{VERSION}-%{RELEASE}.%{ARCH}\n' kernel-core | head -n 1) && \
-    echo "Targeting Kernel: $KVER" && \
-    rpm -qva | grep kernel && \
-    dnf -y install \
-        kernel-devel-$KVER \
-        kernel-headers-$KVER && \
-    dnf -y install --setopt=install_weak_deps=False nvidia-open && \
+RUN dnf -y update kernel* && \
+    dnf -y install kernel-devel kernel-headers && \
+    KVER=$(rpm -q --queryformat '%{VERSION}-%{RELEASE}.%{ARCH}\n' kernel-core | sort -V | tail -n 1) && \
+    dnf -y install nvidia-open && \
     dnf clean all
 
-RUN KVER=$(rpm -q --queryformat '%{VERSION}-%{RELEASE}.%{ARCH}\n' kernel-core | head -n 1) && \
-    ls -l /usr/lib/modules/$KVER/extra/nvidia/nvidia.ko || \
-    (echo "FATAL: Nvidia module was not built for $KVER!" && exit 1)
+RUN KVER=$(rpm -q --queryformat '%{VERSION}-%{RELEASE}.%{ARCH}\n' kernel-core | sort -V | tail -n 1) && \
+    ls -l /usr/lib/modules/$KVER/extra/nvidia/nvidia.ko
 
 RUN dnf -y in virt-manager \
     libvirt-daemon-kvm \
