@@ -76,6 +76,7 @@ RUN mkdir -p /usr/lib/bootc/kargs.d && \
     echo "modprobe.blacklist=nouveau nouveau.modeset=0 rd.driver.blacklist=nouveau" \
     > /usr/lib/bootc/kargs.d/nvidia.conf
 
+RUN echo 'omit_dracutmodules+=" nouveau "' > /etc/dracut.conf.d/omit-nouveau.conf
+
 RUN TARGET_KVER=$(rpm -q --queryformat '%{VERSION}-%{RELEASE}.%{ARCH}\n' kernel-core | head -n 1) && \
-    dracut -f --omit "nouveau" --add-config "modprobe.d" \
-    /boot/initramfs-${TARGET_KVER}.img ${TARGET_KVER}
+    dracut -f /boot/initramfs-${TARGET_KVER}.img ${TARGET_KVER}
