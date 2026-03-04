@@ -50,4 +50,6 @@ RUN dnf -y in virt-manager \
     libvirt-daemon-kvm \
     distrobox
 
+RUN akmods --force
+
 RUN systemctl enable libvirtd
