@@ -8,15 +8,15 @@ RUN dnf -y install \
 
 RUN dnf in -y akmods
 
-RUN mv /usr/bin/akmods{,.bak} && \
-    ln -s /usr/bin/{true,akmods}
+RUN mv /usr/bin/akmodsbuild{,.bak} && \
+    ln -s /usr/bin/{true,akmodsbuild}
 
 RUN dnf -y install \ 
     akmod-nvidia \
     xorg-x11-drv-nvidia-cuda
 
-RUN rm /usr/bin/akmods && \
-    mv /usr/bin/akmods{.bak,}
+RUN rm /usr/bin/akmodsbuild && \
+    mv /usr/bin/akmodsbuild{.bak,}
 
 RUN akmods --force --kernels $(rpm -qva | grep "kernel-devel" | head -n 1 | sed "s/kernel-devel-//")
 
