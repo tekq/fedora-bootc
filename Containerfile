@@ -2,14 +2,10 @@ FROM quay.io/fedora/fedora-bootc:44
 
 RUN systemctl set-default graphical.target
 
-RUN mkdir -p /usr/lib/bootc/kargs.d /usr/lib/ostree-boot/kargs.d && \
-    echo "rd.driver.blacklist=nouveau modprobe.blacklist=nouveau" > /usr/lib/bootc/kargs.d/99-blacklist-nouveau.karg
-
-RUN cp /usr/lib/bootc/kargs.d/99-blacklist-nouveau.karg /usr/lib/ostree-boot/kargs.d/99-blacklist-nouveau.karg
-
-RUN echo 'omit_dracutmodules+=" nouveau "' > /etc/dracut.conf.d/omit-nouveau.conf
-
-RUN dracut --force --verbose
+RUN mkdir -p /usr/lib/bootc/kargs.d/ && \
+    cat <<EOF > /usr/lib/bootc/kargs.d/99-blacklist-nouveau.toml
+kargs = ["rd.driver.blacklist=nouveau", "modprobe.blacklist=nouveau", "nouveau.modeset=0"]
+EOF
 
 RUN dnf -y install \
     gnome-shell \
