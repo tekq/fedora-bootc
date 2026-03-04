@@ -43,3 +43,5 @@ RUN dnf -y in virt-manager \
 RUN systemctl enable libvirtd
 
 RUN systemctl set-default graphical.target
+
+RUN grubby --update-kernel=ALL --args='rd.driver.blacklist=nouveau' --args='modprobe.blacklist=nouveau'
