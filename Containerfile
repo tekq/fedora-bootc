@@ -53,3 +53,5 @@ RUN dnf -y in virt-manager \
 RUN akmods --force --kernels $(rpm -qva | grep "kernel-devel" | head -n 1 | sed "s/kernel-devel-//")
 
 RUN systemctl enable libvirtd
+
+RUN dnf clean all
