@@ -7,6 +7,10 @@ RUN mkdir -p /usr/lib/bootc/kargs.d /usr/lib/ostree-boot/kargs.d && \
 
 RUN cp /usr/lib/bootc/kargs.d/99-blacklist-nouveau.karg /usr/lib/ostree-boot/kargs.d/99-blacklist-nouveau.karg
 
+RUN echo 'omit_dracutmodules+=" nouveau "' > /etc/dracut.conf.d/omit-nouveau.conf
+
+RUN dracut --force --verbose
+
 RUN dnf -y install \
     gnome-shell \
     gdm \
