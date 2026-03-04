@@ -1,5 +1,7 @@
 FROM quay.io/fedora/fedora-silverblue:44
 
+RUN dnf config-manager --set-disabled rawhide || true
+
 RUN systemctl set-default graphical.target
 
 RUN mkdir -p /usr/lib/bootc/kargs.d/ && \
