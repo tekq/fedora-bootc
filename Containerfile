@@ -28,55 +28,16 @@ RUN mkdir -p /etc/flatpak/remotes.d && \
 
 RUN systemctl -f enable gdm
 
-RUN dnf -y install --nogpgcheck \ 
-    https://dl.fedoraproject.org/pub/epel/epel-release-latest-$(rpm -E %rhel).noarch.rpm
+sudo dnf -y install \
+     https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm \
+     https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
 
-RUN dnf -y install --nogpgcheck \ 
-    https://mirrors.rpmfusion.org/free/el/rpmfusion-free-release-$(rpm -E %rhel).noarch.rpm \
-    https://mirrors.rpmfusion.org/nonfree/el/rpmfusion-nonfree-release-$(rpm -E %rhel).noarch.rpm
-
-RUN /usr/bin/crb enable
-
-RUN dnf -y config-manager --add-repo \
-    https://developer.download.nvidia.com/compute/cuda/repos/rhel10/x86_64/cuda-rhel10.repo
-
-RUN TARGET_KVER=$(dnf repoquery --requires --recursive --resolve nvidia-open | \
-    grep "^kernel-devel-[0-9]" | \
-    sed 's/^kernel-devel-[0-9]://' | \
-    sort -V | tail -n 1) && \
-    echo "Identified Target: $TARGET_KVER" && \
-    dnf install -y \
-        kernel-core-${TARGET_KVER} \
-        kernel-modules-${TARGET_KVER} \
-        kernel-modules-extra-${TARGET_KVER} \
-        kernel-devel-${TARGET_KVER} \
-        kernel-headers-${TARGET_KVER} && \
-    rpm -qa | grep kernel-core | grep -v "${TARGET_KVER}" | xargs -r dnf remove -y && \
-    find /usr/lib/modules -mindepth 1 -maxdepth 1 -type d ! -name "${TARGET_KVER}" -exec rm -rf {} + && \
-    dnf install -y nvidia-open && \
-    NVIDIA_VER=$(rpm -q --queryformat '%{VERSION}' kmod-nvidia-open-dkms) && \
-    dkms install -m nvidia -v ${NVIDIA_VER} -k ${TARGET_KVER} && \
-    dnf clean all
-
-RUN TARGET_KVER=$(rpm -q --queryformat '%{VERSION}-%{RELEASE}.%{ARCH}\n' kernel-core | head -n 1) && \
-    echo "Searching for modules in /usr/lib/modules/${TARGET_KVER}..." && \
-    find /usr/lib/modules/${TARGET_KVER} -name "nvidia.ko*" || (echo "STILL MISSING!" && exit 1)
+RUN dnf -y install \ 
+    akmod-nvidia \
+    xorg-x11-drv-nvidia-cuda
 
 RUN dnf -y in virt-manager \
     libvirt-daemon-kvm \
     distrobox
 
 RUN systemctl enable libvirtd
-
-RUN echo "install nouveau /usr/bin/false" > /etc/modprobe.d/nouveau-disable.conf && \
-    echo "blacklist nouveau" >> /etc/modprobe.d/nouveau-disable.conf && \
-    echo "options nouveau modeset=0" >> /etc/modprobe.d/nouveau-disable.conf
-
-RUN mkdir -p /usr/lib/bootc/kargs.d && \
-    echo "modprobe.blacklist=nouveau nouveau.modeset=0 rd.driver.blacklist=nouveau" \
-    > /usr/lib/bootc/kargs.d/nvidia.conf
-
-RUN echo 'omit_dracutmodules+=" nouveau "' > /etc/dracut.conf.d/omit-nouveau.conf
-
-RUN TARGET_KVER=$(rpm -q --queryformat '%{VERSION}-%{RELEASE}.%{ARCH}\n' kernel-core | head -n 1) && \
-    dracut -f /boot/initramfs-${TARGET_KVER}.img ${TARGET_KVER}
