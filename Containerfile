@@ -4,7 +4,7 @@ RUN systemctl set-default graphical.target
 
 RUN mkdir -p /usr/lib/bootc/kargs.d /usr/lib/ostree-boot/kargs.d && \
     echo "rd.driver.blacklist=nouveau modprobe.blacklist=nouveau" > /usr/lib/bootc/kargs.d/99-blacklist-nouveau.karg \
-    ln -s /usr/lib/bootc/kargs.d/99-blacklist-nouveau.karg /usr/lib/ostree-boot/kargs.d/99-blacklist-nouveau.karg
+    cp /usr/lib/bootc/kargs.d/99-blacklist-nouveau.karg /usr/lib/ostree-boot/kargs.d/99-blacklist-nouveau.karg
 
 RUN dnf -y install \
     gnome-shell \
