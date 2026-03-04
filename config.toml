@@ -10,6 +10,4 @@ keyboard --vckeymap=us --layout=us
 lang en_US.UTF-8
 timezone UTC
 network --bootproto=dhcp --device=link --activate --onboot=on
-
-bootloader --append="systemd.unit=graphical.target"
 """
