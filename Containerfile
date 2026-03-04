@@ -50,6 +50,6 @@ RUN dnf -y in virt-manager \
     libvirt-daemon-kvm \
     distrobox
 
-RUN akmods --force
+RUN akmods --force --kernels $(rpm -qva | grep "kernel-devel" | head -n 1 | sed "s/kernel-devel-//")
 
 RUN systemctl enable libvirtd
