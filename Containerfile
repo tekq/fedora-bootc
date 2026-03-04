@@ -41,3 +41,5 @@ RUN dnf -y in virt-manager \
     distrobox
 
 RUN systemctl enable libvirtd
+
+RUN systemctl set-default graphical.target
