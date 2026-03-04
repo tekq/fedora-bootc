@@ -3,9 +3,7 @@ FROM quay.io/fedora/fedora-bootc:44
 RUN systemctl set-default graphical.target
 
 RUN mkdir -p /usr/lib/bootc/kargs.d/ && \
-    cat <<EOF > /usr/lib/bootc/kargs.d/99-blacklist-nouveau.toml
-kargs = ["rd.driver.blacklist=nouveau", "modprobe.blacklist=nouveau", "nouveau.modeset=0"]
-EOF
+    echo 'kargs = ["rd.driver.blacklist=nouveau", "modprobe.blacklist=nouveau", "nouveau.modeset=0"]' > /usr/lib/bootc/kargs.d/99-blacklist-nouveau.toml
 
 RUN dnf -y install \
     gnome-shell \
