@@ -29,6 +29,13 @@ RUN mkdir -p /usr/lib/bootc/kargs.d/ && \
 RUN dnf -y in virt-manager \
     libvirt-daemon-kvm \
     distrobox && \
+    dnf -y rm firefox \
+    yelp \
+    gnome-software \
+    malcontent \
+    gnome-tour \
+    gnome-system-monitor \
+    gnome-disk-utility && \
     dnf clean all
 
 RUN systemctl enable libvirtd && \
