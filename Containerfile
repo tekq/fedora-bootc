@@ -32,7 +32,6 @@ RUN dnf -y in virt-manager \
     dnf -y rm firefox \
     yelp \
     gnome-software \
-    malcontent \
     gnome-tour \
     gnome-system-monitor \
     gnome-disk-utility && \
