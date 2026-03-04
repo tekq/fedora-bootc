@@ -5,6 +5,12 @@ RUN systemctl set-default graphical.target
 RUN mkdir -p /usr/lib/bootc/kargs.d/ && \
     echo 'kargs = ["rd.driver.blacklist=nouveau", "modprobe.blacklist=nouveau", "nouveau.modeset=0"]' > /usr/lib/bootc/kargs.d/99-blacklist-nouveau.toml
 
+RUN mkdir -p /usr/lib/bootc/kargs.d/ && \
+    echo 'kargs = ["systemd.unit=graphical.target"]' > /usr/lib/bootc/kargs.d/01-boot-graphical.toml
+
+RUN mkdir -p /usr/lib/bootc/kargs.d/ && \
+    echo 'kargs = ["quiet", "rhgb", "loglevel=3", "rd.udev.log_level=3", "vt.global_cursor_default=0"]' > /usr/lib/bootc/kargs.d/01-silent-boot.toml
+
 RUN dnf -y install \
     gnome-shell \
     gdm \
