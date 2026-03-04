@@ -1,4 +1,4 @@
-FROM quay.io/centos-bootc/centos-bootc:stream10
+FROM quay.io/fedora/fedora-bootc:44
 
 
 RUN dnf -y install \
