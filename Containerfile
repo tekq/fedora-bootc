@@ -1,4 +1,4 @@
-FROM ghcr.io/ublue-os/bluefin-nvidia:44
+FROM ghcr.io/ublue-os/base-nvidia:44
 
 RUN dnf config-manager --set-disabled rawhide || true
 
