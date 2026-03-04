@@ -1,5 +1,9 @@
 FROM quay.io/fedora/fedora-bootc:44
 
+RUN systemctl set-default graphical.target
+
+RUN mkdir -p /usr/lib/bootc/kargs.d && \
+    echo "rd.driver.blacklist=nouveau modprobe.blacklist=nouveau" > /usr/lib/bootc/kargs.d/99-blacklist-nouveau.karg
 
 RUN dnf -y install \
     gnome-shell \
@@ -41,7 +45,3 @@ RUN dnf -y in virt-manager \
     distrobox
 
 RUN systemctl enable libvirtd
-
-RUN systemctl set-default graphical.target
-
-RUN grubby --update-kernel=ALL --args='rd.driver.blacklist=nouveau' --args='modprobe.blacklist=nouveau'
