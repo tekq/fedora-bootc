@@ -33,8 +33,7 @@ RUN dnf -y in virt-manager \
     yelp \
     gnome-software \
     gnome-tour \
-    gnome-system-monitor \
-    gnome-disk-utility && \
+    gnome-system-monitor && \
     dnf clean all
 
 RUN systemctl enable libvirtd && \
