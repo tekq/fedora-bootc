@@ -28,7 +28,8 @@ RUN mkdir -p /usr/lib/bootc/kargs.d/ && \
 
 RUN dnf -y in virt-manager \
     libvirt-daemon-kvm \
-    distrobox && \
+    distrobox 
+    gnome-disk-utility && \
     dnf -y rm firefox \
     yelp \
     gnome-software \
