@@ -1,0 +1,17 @@
+{
+    "default": [
+        {
+            "type": "insecureAcceptAnything"
+        }
+    ],
+    "transports": {
+        "docker": {
+            "quay.io/asmx2/fedora-bootc": [
+                {
+                    "type": "sigstoreSigned",
+                    "keyPath": "/etc/pki/containers/asmx2-bootc.pub"
+                }
+            ]
+        }
+    }
+}

@@ -40,4 +40,11 @@ RUN dnf -y in virt-manager \
 RUN systemctl enable libvirtd && \
     systemctl mask NetworkManager-wait-online.service
 
+RUN mkdir -p /etc/pki/containers
+
+COPY cosign.pub /etc/pki/containers/asmx2-bootc.pub
+
+COPY policy.json /etc/containers/policy.json
+
 RUN dnf clean all
+
