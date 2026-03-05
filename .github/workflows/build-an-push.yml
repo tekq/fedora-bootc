@@ -1,24 +1,22 @@
-name: Build and Push bootc Image
+name: Build and Push bootc Image to Quay
 on:
   schedule:
-    - cron:
-        "00 02 * * *"
+    - cron: "00 02 * * *" # Daily rebuild to catch Fedora/bootc updates
   push:
     paths-ignore:
       - "**.md"
   workflow_dispatch:
 
 env:
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
+  REGISTRY: quay.io
+  IMAGE_NAME: asmx2/${{ github.event.repository.name }}
 
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      packages: write
-      id-token: write # Required for Cosign keyless signing if preferred
+      id-token: write 
 
     steps:
       - name: Checkout repository
@@ -27,17 +25,11 @@ jobs:
       - name: Install Cosign
         uses: sigstore/cosign-installer@v3.4.0
 
-      - name: Generate Cosign Private Key
-        run: |
-          cosign generate-key-pair
-        env:
-          COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
-
-      - name: Log in to GHCR
+      - name: Log in to Quay.io
         uses: redhat-actions/podman-login@v1
         with:
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          username: ${{ secrets.QUAY_USERNAME }}
+          password: ${{ secrets.QUAY_ROBOT_TOKEN }}
           registry: ${{ env.REGISTRY }}
 
       - name: Build Image
@@ -47,9 +39,10 @@ jobs:
           image: ${{ env.IMAGE_NAME }}
           tags: latest ${{ github.sha }}
           containerfiles: ./Containerfile
+          oci: true
 
-      - name: Push to GHCR
-        id: push-to-ghcr
+      - name: Push to Quay
+        id: push-to-quay
         uses: redhat-actions/push-to-registry@v2
         with:
           image: ${{ steps.build-image.outputs.image }}
@@ -58,7 +51,8 @@ jobs:
 
       - name: Sign the published image
         run: |
-          cosign sign --yes --key cosign.key \
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          cosign sign --yes --key env://COSIGN_PRIVATE_KEY \
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ steps.push-to-quay.outputs.digest }}
         env:
+          COSIGN_PRIVATE_KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
           COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
