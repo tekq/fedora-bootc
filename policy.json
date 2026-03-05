@@ -9,7 +9,10 @@
             "quay.io/asmx2/fedora-bootc": [
                 {
                     "type": "sigstoreSigned",
-                    "keyPath": "/etc/pki/containers/asmx2-bootc.pub"
+                    "keyPath": "/etc/pki/containers/asmx2-bootc.pub",
+                    "signedIdentity": {
+                        "type": "matchRepository"
+                    }
                 }
             ]
         }
