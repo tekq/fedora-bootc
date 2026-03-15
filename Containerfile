@@ -30,6 +30,8 @@ RUN dnf -y in virt-manager \
     libvirt-daemon-kvm \
     distrobox \
     bootupd \
+    shim-x64 \
+    systemd-boot-unsigned \
     gnome-disk-utility && \
     dnf -y rm firefox \
     yelp \
