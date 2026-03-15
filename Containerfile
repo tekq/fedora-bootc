@@ -1,4 +1,5 @@
 FROM quay.io/fedora/fedora-silverblue:44
+LABEL containers.bootc.rootfs-type=composefs
 
 RUN dnf -y install \
      https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm \
