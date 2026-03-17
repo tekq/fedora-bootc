@@ -24,7 +24,7 @@ RUN mkdir -p /usr/lib/bootc/kargs.d/ && \
     echo 'kargs = ["rd.driver.blacklist=nouveau", "modprobe.blacklist=nouveau", "nouveau.modeset=0"]' > /usr/lib/bootc/kargs.d/99-blacklist-nouveau.toml
 
 RUN mkdir -p /usr/lib/bootc/kargs.d/ && \
-    echo 'kargs = ["quiet", "splash", "rhgb", "loglevel=3", "rd.udev.log_level=3"]' > /usr/lib/bootc/kargs.d/01-silent-boot.toml
+    echo 'kargs = ["quiet", "loglevel=3", "rd.udev.log_level=3"]' > /usr/lib/bootc/kargs.d/01-silent-boot.toml
 
 RUN dnf -y in virt-manager \
     libvirt-daemon-kvm \
@@ -34,7 +34,9 @@ RUN dnf -y in virt-manager \
     yelp \
     gnome-software \
     gnome-tour \
-    gnome-system-monitor && \
+    gnome-system-monitor \
+    plymouth \
+    rpm-ostree && \
     dnf clean all
 
 RUN systemctl enable libvirtd && \
