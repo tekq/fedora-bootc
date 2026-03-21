@@ -35,6 +35,7 @@ RUN dnf -y in virt-manager \
     gnome-software \
     gnome-tour \
     gnome-system-monitor \
+    malcontent-control \
     plymouth \
     rpm-ostree && \
     dnf clean all
