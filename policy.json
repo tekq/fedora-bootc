@@ -21,7 +21,10 @@
             "docker.io": [
                 { "type": "insecureAcceptAnything" }
             ],
-            "quay.io/repository/fedora": [
+            "quay.io": [
+                { "type": "insecureAcceptAnything" }
+            ],
+            "ghcr.io": [
                 { "type": "insecureAcceptAnything" }
             ]
         }
