@@ -40,7 +40,8 @@ RUN dnf -y in virt-manager \
     rpm-ostree && \
     dnf clean all
 
-RUN systemctl enable libvirtd && \
+RUN systemctl enable libvirtd.service && \
+    systemctl enable bootc-fetch-apply-updates.service && \
     systemctl mask NetworkManager-wait-online.service
 
 RUN flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
