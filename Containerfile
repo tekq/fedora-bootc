@@ -43,6 +43,8 @@ RUN dnf -y in virt-manager \
 RUN systemctl enable libvirtd && \
     systemctl mask NetworkManager-wait-online.service
 
+RUN flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+
 RUN mkdir -p /etc/pki/containers /etc/containers/registries.d
 
 COPY cosign.pub /etc/pki/containers/asmx2-bootc.pub
